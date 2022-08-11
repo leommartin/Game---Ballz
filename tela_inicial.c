@@ -3,6 +3,9 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_color.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -33,6 +36,14 @@ int main()
     must_init(font, "font");
 
     must_init(al_init_primitives_addon(), "primitives");
+
+    // Inicializa addons de fonte
+    must_init(al_init_font_addon(), "font addon");
+    must_init(al_init_ttf_addon(), "ttf addon");
+
+    // Cria fonte
+    ALLEGRO_FONT* displayFont = al_load_font("desenho.ttf", 100, 0);
+    ALLEGRO_FONT* fontGame = al_load_font("game_over.ttf", 30, 0);
 
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(display));
@@ -68,8 +79,17 @@ int main()
 
         if(redraw && al_is_event_queue_empty(queue))
         {
-            al_clear_to_color(al_map_rgb(47,79,79));
-            al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT/2, ALLEGRO_ALIGN_CENTER, "Ballz");
+            al_clear_to_color(al_map_rgb(0,0,0));
+            
+            // Desenha texto com a fonte criada
+            al_draw_text(displayFont, al_map_rgb(255, 20, 147), WIDTH/2-80, HEIGHT/4, ALLEGRO_ALIGN_CENTER, "B");
+            al_draw_text(displayFont, al_map_rgb(255, 165, 0), WIDTH/2-20, HEIGHT/4, ALLEGRO_ALIGN_CENTER, "a");
+            al_draw_text(displayFont, al_map_rgb(0, 0, 205), WIDTH/2+20, HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
+            al_draw_text(displayFont, al_map_rgb(0, 255, 255), WIDTH/2+50, HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
+            al_draw_text(displayFont, al_map_rgb(124,252,0), WIDTH/2+90, HEIGHT/4, ALLEGRO_ALIGN_CENTER, "z");
+
+            al_draw_filled_rounded_rectangle(WIDTH/2-95, HEIGHT/2, WIDTH/2+100, HEIGHT/2+40, 20, 20, al_map_rgb(255, 20, 147));
+            al_draw_text(fontGame, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT/2+10, ALLEGRO_ALIGN_CENTER, "PLAY");
 
             al_flip_display();
 
@@ -78,9 +98,14 @@ int main()
     }
 
     al_destroy_font(font);
+    al_destroy_font(displayFont);
     al_destroy_display(display);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 
     return 0;
 }
+
+// deeppink 255, 20, 147
+// mediumvioletred 199,21,133
+// fuchsia 255,0,255
