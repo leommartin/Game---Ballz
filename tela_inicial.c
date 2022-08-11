@@ -18,6 +18,13 @@ void must_init(bool test, const char *description)
     exit(1);
 }
 
+int play_clicked_button()
+{
+
+}
+
+
+
 int main()
 {
     must_init(al_init(), "allegro");
@@ -36,6 +43,8 @@ int main()
     must_init(font, "font");
 
     must_init(al_init_primitives_addon(), "primitives");
+    must_init(al_install_mouse(), "mouse");
+    // al_grab_mouse(display);
 
     // Inicializa addons de fonte
     must_init(al_init_font_addon(), "font addon");
@@ -48,12 +57,16 @@ int main()
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(display));
     al_register_event_source(queue, al_get_timer_event_source(timer));
+    al_register_event_source(queue, al_get_mouse_event_source());
 
     bool done = false;
     bool redraw = true;
+    float x,y;
     ALLEGRO_EVENT event;
+    ALLEGRO_MOUSE_STATE mouse_state;
 
-   al_start_timer(timer);
+
+    al_start_timer(timer);
     while(1)
     {
         al_wait_for_event(queue, &event);
@@ -64,6 +77,16 @@ int main()
                 // game logic goes here.
                 redraw = true;
                 break;
+
+            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                al_get_mouse_state(&mouse_state);
+
+                if(play_button_clicked(&mouse_state)) 
+                {
+                    // dentro da função é feito collide
+                }
+                // x = event.mouse.x;
+                // y = event.mouse.y;
 
             case ALLEGRO_EVENT_KEY_DOWN:
                 if(event.keyboard.keycode != ALLEGRO_KEY_ESCAPE)
