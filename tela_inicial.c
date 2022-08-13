@@ -58,7 +58,7 @@ int main()
     must_init(al_init_ttf_addon(), "ttf addon");
 
     // Cria fonte 
-    ALLEGRO_FONT* displayFont = al_load_font("desenho.ttf", 100, 0);
+    ALLEGRO_FONT* logoFont = al_load_font("desenho.ttf", 100, 0);
     ALLEGRO_FONT* fontGame = al_load_font("game_over.ttf", 30, 0);
 
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -108,11 +108,11 @@ int main()
             al_clear_to_color(al_map_rgb(0,0,0));
             
             // Desenha texto com a fonte criada
-            al_draw_text(displayFont, al_map_rgb(234, 35, 94), DISPLAY_WIDTH/2-80, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "B");
-            al_draw_text(displayFont, al_map_rgb(255, 165, 0), DISPLAY_WIDTH/2-20, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "a");
-            al_draw_text(displayFont, al_map_rgb(0, 0, 205), DISPLAY_WIDTH/2+20, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
-            al_draw_text(displayFont, al_map_rgb(0, 255, 255), DISPLAY_WIDTH/2+50, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
-            al_draw_text(displayFont, al_map_rgb(124,252,0), DISPLAY_WIDTH/2+90, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "z");
+            al_draw_text(logoFont, al_map_rgb(234, 35, 94), DISPLAY_WIDTH/2-80, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "B");
+            al_draw_text(logoFont, al_map_rgb(255, 165, 0), DISPLAY_WIDTH/2-20, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "a");
+            al_draw_text(logoFont, al_map_rgb(0, 0, 205), DISPLAY_WIDTH/2+20, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
+            al_draw_text(logoFont, al_map_rgb(0, 255, 255), DISPLAY_WIDTH/2+50, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
+            al_draw_text(logoFont, al_map_rgb(124,252,0), DISPLAY_WIDTH/2+90, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "z");
 
             // Desenha botão de PLAY
             al_draw_filled_rounded_rectangle(DISPLAY_WIDTH/2-95, DISPLAY_HEIGHT/2, DISPLAY_WIDTH/2+100, DISPLAY_HEIGHT/2+40, 20, 20, al_map_rgb(234, 35, 94));
@@ -125,13 +125,15 @@ int main()
     }
 
     al_destroy_font(fontGame);
-    al_destroy_font(displayFont);
+    al_destroy_font(logoFont);
     al_destroy_display(display);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 
     return 0;
 }
+
+// button collor of Ballz (234, 35, 94)
 
 // deeppink 255, 20, 147
 // mediumvioletred 199,21,133
