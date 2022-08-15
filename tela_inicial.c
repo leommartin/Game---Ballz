@@ -10,9 +10,18 @@
 #define BUFFER_WIDTH    320
 #define BUFFER_HEIGHT   240
 
-#define DISPLAY_SCALE   2.5
-#define DISPLAY_WIDTH   (BUFFER_WIDTH  * DISPLAY_SCALE)
-#define DISPLAY_HEIGHT  (BUFFER_HEIGHT * DISPLAY_SCALE)
+#define DISPLAY_SCALE   2
+#define DISPLAY_WIDTH   (BUFFER_WIDTH    * DISPLAY_SCALE)
+#define DISPLAY_HEIGHT  (BUFFER_HEIGHT   * DISPLAY_SCALE)
+#define LETTER_HEIGHT   (BUFFER_HEIGHT/4 * DISPLAY_SCALE)
+
+#define PLAY_BUTTON_POS_X1 (DISPLAY_WIDTH/2-100)
+#define PLAY_BUTTON_POS_Y1 (DISPLAY_HEIGHT/2)
+#define PLAY_BUTTON_POS_X2 (DISPLAY_WIDTH/2+100)
+#define PLAY_BUTTON_POS_Y2 (DISPLAY_HEIGHT/2+40)
+#define ROUNDED_SIZE       20
+
+#define ROSA               234, 35, 94
 
 void must_init(bool test, const char *description)
 {
@@ -23,10 +32,35 @@ void must_init(bool test, const char *description)
     exit(1);
 }
 
-// int play_clicked_button()
-// {
+bool collide(int p1_x1, int p1_y1, int p1_x2, int p1_y2, int p2_x1, int p2_y1, int p2_x2, int p2_y2)
+{
+    if(p1_x1 > p2_x2)
+        return false;
+    if(p1_x2 < p2_x1)
+        return false;
+    if(p1_y1 > p2_y2)
+        return false;
+    if(p1_y2 < p2_y1)
+        return false;
 
-// }
+    return true;
+}
+
+bool click_play_button(ALLEGRO_MOUSE_STATE *mouse_state)
+{
+    return collide
+    (
+        mouse_state->x,
+        mouse_state->y,
+        mouse_state->x,
+        mouse_state->y,
+        PLAY_BUTTON_POS_X1,
+        PLAY_BUTTON_POS_Y1,
+        PLAY_BUTTON_POS_X2,
+        PLAY_BUTTON_POS_Y2
+    );
+}
+
 
 int main()
 {
@@ -86,10 +120,11 @@ int main()
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 al_get_mouse_state(&mouse_state);
 
-                // if(play_button_clicked(&mouse_state)) 
-                // {
-                //     // dentro da função é feito collide
-                // }
+                if(click_play_button(&mouse_state)) 
+                {
+                    fprintf(stderr,"Botão play foi acionado.");
+                }
+                break;
 
             case ALLEGRO_EVENT_KEY_DOWN:
                 if(event.keyboard.keycode != ALLEGRO_KEY_ESCAPE)
@@ -107,16 +142,26 @@ int main()
         {
             al_clear_to_color(al_map_rgb(0,0,0));
             
-            // Desenha texto com a fonte criada
-            al_draw_text(logoFont, al_map_rgb(234, 35, 94), DISPLAY_WIDTH/2-80, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "B");
-            al_draw_text(logoFont, al_map_rgb(255, 165, 0), DISPLAY_WIDTH/2-20, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "a");
-            al_draw_text(logoFont, al_map_rgb(0, 0, 205), DISPLAY_WIDTH/2+20, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
-            al_draw_text(logoFont, al_map_rgb(0, 255, 255), DISPLAY_WIDTH/2+50, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "l");
-            al_draw_text(logoFont, al_map_rgb(124,252,0), DISPLAY_WIDTH/2+90, DISPLAY_HEIGHT/4, ALLEGRO_ALIGN_CENTER, "z");
+            // Desenha texto com a fonte logo ttf
+            al_draw_text(logoFont, al_map_rgb(234, 35, 94), DISPLAY_WIDTH/2-80, LETTER_HEIGHT, ALLEGRO_ALIGN_CENTER, "B");
+            al_draw_text(logoFont, al_map_rgb(255, 165, 0), DISPLAY_WIDTH/2-20, LETTER_HEIGHT, ALLEGRO_ALIGN_CENTER, "a");
+            al_draw_text(logoFont, al_map_rgb(0, 0, 205), DISPLAY_WIDTH/2+20, LETTER_HEIGHT, ALLEGRO_ALIGN_CENTER, "l");
+            al_draw_text(logoFont, al_map_rgb(0, 255, 255), DISPLAY_WIDTH/2+50, LETTER_HEIGHT, ALLEGRO_ALIGN_CENTER, "l");
+            al_draw_text(logoFont, al_map_rgb(124,252,0), DISPLAY_WIDTH/2+90, LETTER_HEIGHT, ALLEGRO_ALIGN_CENTER, "z");
 
             // Desenha botão de PLAY
-            al_draw_filled_rounded_rectangle(DISPLAY_WIDTH/2-95, DISPLAY_HEIGHT/2, DISPLAY_WIDTH/2+100, DISPLAY_HEIGHT/2+40, 20, 20, al_map_rgb(234, 35, 94));
-            al_draw_text(fontGame, al_map_rgb(255, 255, 255), DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2+10, ALLEGRO_ALIGN_CENTER, "PLAY");
+            al_draw_filled_rounded_rectangle(PLAY_BUTTON_POS_X1, PLAY_BUTTON_POS_Y1, PLAY_BUTTON_POS_X2, PLAY_BUTTON_POS_Y2, ROUNDED_SIZE, ROUNDED_SIZE, al_map_rgb(ROSA));
+            
+            // Desenha palavra PLAY usando o retangulo como referência
+            al_draw_text
+            (
+                fontGame, 
+                al_map_rgb(255, 255, 255),
+                 (PLAY_BUTTON_POS_X1 + (PLAY_BUTTON_POS_X2 - PLAY_BUTTON_POS_X1)/2), 
+                 (PLAY_BUTTON_POS_Y1 + (PLAY_BUTTON_POS_Y2 - PLAY_BUTTON_POS_Y1)/4),
+                 ALLEGRO_ALIGN_CENTER, 
+                 "PLAY"
+            );
 
             al_flip_display();
 
