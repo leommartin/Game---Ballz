@@ -103,24 +103,24 @@ int main()
                     b->x += b->dx;
                     b->y += b->dy;
 
-                    if(b->x < 0)
+                    if(b->x <= 0)
                     {
                         b->x  *= -1;
                         b->dx *= -1;
                     }
-                    if(b->x > 640)
+                    if(b->x >= DISPLAY_WIDTH)
                     {
-                        b->x -= (b->x - 640);
+                        b->x -= (b->x - DISPLAY_WIDTH);
                         b->dx *= -1;
                     }
-                    if(b->y < 0)
+                    if(b->y <= 0)
                     {
                         b->y  *= -1;
                         b->dy *= -1;
                     }
-                    if(b->y > 480)
+                    if(b->y >= DISPLAY_HEIGHT)
                     {
-                        b->x -= (b->y - 480);
+                        b->x -= (b->y - DISPLAY_HEIGHT);
                         b->dy *= -1;
                     }
                 }
@@ -159,7 +159,7 @@ int main()
                 switch(b->type)
                 {
                     case BT_CIRCLE:
-                        al_draw_filled_circle(b->x, b->y, 8, al_map_rgb(255,255,255));
+                        al_draw_filled_circle(b->x, b->y, 10, al_map_rgb(255,255,255));
                         break;
                 }
             } 
