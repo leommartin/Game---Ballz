@@ -17,6 +17,7 @@
 #define DISPLAY_HEIGHT  (BUFFER_HEIGHT   * DISPLAY_SCALE)
 
 #define BOUNCER_SIZE 10
+#define SPEED 4
 
 enum BOUNCER_TYPE 
 {
@@ -72,9 +73,10 @@ int main()
 
     ALLEGRO_EVENT event;
     ALLEGRO_MOUSE_STATE mouse_state;
+    float mouse_x, mouse_y;
 
     BOUNCER b;
-    bool mouse_button_state, ground;
+    bool mouse_button_state = false, ground;
     
     bool done = false;
     bool redraw = true;
@@ -95,6 +97,8 @@ int main()
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 // al_get_mouse_state(&mouse_state);
                 mouse_button_state = true;
+                mouse_x = event.mouse.x;
+                mouse_y = event.mouse.y;
                 break;
 
             case ALLEGRO_EVENT_TIMER:
@@ -102,7 +106,7 @@ int main()
                 if(mouse_button_state)
                 {
                     if(b.x < BOUNCER_SIZE || b.x > DISPLAY_WIDTH - BOUNCER_SIZE)
-                    b.dx = - (b.dx);
+                        b.dx = - (b.dx);
             
                     if(b.y < BOUNCER_SIZE) 
                         b.dy = - (b.dy);
@@ -110,7 +114,7 @@ int main()
                     if (b.y > DISPLAY_HEIGHT - BOUNCER_SIZE)
                     {
                         ground = 1;
-                        printf("ground: %d\n", ground);
+                        printf("Ball returned to the ground!\n");
 
                         mouse_button_state = false;
 
@@ -120,8 +124,11 @@ int main()
                     } 
                     else 
                     {
-                        b.x += b.dx;
-                        b.y += b.dy;
+                        double bullet_direction = atan2(mouse_y - b.y , mouse_x - b.x);
+                        b.x += SPEED * cos(bullet_direction);
+                        b.y += SPEED * sin(bullet_direction);
+                        // b.x += b.dx;
+                        // b.y += b.dy;
                     }
                 } 
                 redraw = true;
@@ -133,7 +140,7 @@ int main()
                 break;      
             
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                
+                done = true;                    
                 break;
         }
 
