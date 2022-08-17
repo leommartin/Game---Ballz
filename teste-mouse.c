@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 /* Allegro */
 #include <allegro5/allegro.h>
@@ -16,6 +17,7 @@
 
 #define BOUNCER_SIZE 10
 #define GRID 4.0
+#define SPEED 20
 
 //-----------------------------------------------------------------------------
 
@@ -25,8 +27,8 @@ int main(int argc, char *argv[])
   // ALLEGRO_BITMAP *image, *image1, *image2;
 
   bool redraw = true, sair = false;
-  float bouncer_x, bouncer_y, bouncer_dx = GRID, bouncer_dy = -GRID;
-  bool mouse_button_state, ground;
+  float bouncer_x, bouncer_y, bouncer_dx, bouncer_dy;
+  int mouse_button_state, ground;
 
   win = graphinit(RES_WIDTH, RES_HEIGHT);
 
@@ -39,14 +41,23 @@ int main(int argc, char *argv[])
 
   bouncer_x = win.disp_data.width / 2;
   bouncer_y = win.disp_data.height - BOUNCER_SIZE;
+  bouncer_dx = SPEED;
+  bouncer_dy = -SPEED;
+  
 
   /* Enquanto  a tecla ESC  n�o for  pressionada, ir� executar
      o c�digo especificado
   */
   // int i = 0;
+  ALLEGRO_EVENT ev;
+  float mouse_x, mouse_y;
+  double direction;
+//   mouse_button_state = 2;
+  int speed = SPEED;
+
   while (!sair) 
   {
-      ALLEGRO_EVENT ev;
+      
       al_wait_for_event(win.event_queue, &ev);
 
       ground = false;
@@ -55,15 +66,26 @@ int main(int argc, char *argv[])
       switch (ev.type) 
       {
         case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-          mouse_button_state = true;
-          break;
+            
+            mouse_button_state = true;
+            mouse_x = ev.mouse.x;
+            mouse_y = ev.mouse.y;
+
+            if((mouse_x <= win.disp_data.width * 0.25) || (mouse_x >= win.disp_data.width * 0.75))
+                speed = SPEED * 1.05;
+            else 
+                speed = SPEED;
+
+            direction = atan2(mouse_y - bouncer_y , mouse_x - bouncer_x);
+            bouncer_dx = speed * cos(direction);
+            bouncer_dy = speed * sin(direction);
+
+            break;
     
         case ALLEGRO_EVENT_TIMER:
             
             if(mouse_button_state)
             {
-              while(!ground)
-              {
                   if(bouncer_x < BOUNCER_SIZE || bouncer_x > win.disp_data.width - BOUNCER_SIZE)
                     bouncer_dx = -bouncer_dx;
                   
@@ -76,20 +98,16 @@ int main(int argc, char *argv[])
                       ground = 1;
                       printf("ground: %d\n", ground);
                       mouse_button_state = false;
-                      bouncer_dx = GRID;
-                      bouncer_dy = -GRID;
                       bouncer_y = win.disp_data.height - BOUNCER_SIZE;
                   }
                   else
-                  {
-                      bouncer_x += bouncer_dx;
-                      bouncer_y += bouncer_dy;
+                  { 
+                    bouncer_x += bouncer_dx;
+                    bouncer_y += bouncer_dy;
                   }
-                  
-                  redraw = true;
-                  break;
-              }
             }
+
+            redraw = true;
             break;
 
         case ALLEGRO_EVENT_DISPLAY_CLOSE: 
@@ -97,34 +115,20 @@ int main(int argc, char *argv[])
             break;
     
         case ALLEGRO_EVENT_KEY_UP:
-            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) sair = true;
-                break;
-
-        // case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-        //   image1 = image;
-        //   image = image2;
-        //   image2 = image1;
-        //   break;
-
-        // case ALLEGRO_EVENT_MOUSE_AXES:
-        // case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
-        //     bouncer_x = ev.mouse.x;
-        //     bouncer_y = ev.mouse.y;
-        //     break;
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) 
+                sair = true;
+            break;
     }
 
     if(redraw && al_is_event_queue_empty(win.event_queue)) 
     {
       redraw = false;
-      al_clear_to_color(VERDE);
-      // al_draw_bitmap(image, bouncer_x, bouncer_y, 0);
+      al_clear_to_color(PRETO);
       al_draw_filled_circle(bouncer_x, bouncer_y, BOUNCER_SIZE, al_map_rgb(255,255,255));
       
       al_flip_display();
     }
   } 
-
-  // al_destroy_bitmap(image)
 
   graphdeinit(win);
 }
