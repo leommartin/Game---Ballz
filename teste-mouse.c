@@ -12,73 +12,74 @@
 /* Graficos */
 #include "grafico.h"
 
-#define RES_WIDTH 800
-#define RES_HEIGHT 600
+#define RES_WIDTH    800
+#define RES_HEIGHT   600
 
 #define BOUNCER_SIZE 10
-#define GRID 4.0
-#define SPEED 20
+#define GRID         4.0
+#define SPEED        20
+#define SPEED2       (SPEED * 1.05)
+
+
+struct ball
+{
+  float x,y;
+  float dx,dy;
+};
+typedef struct ball ball_t;
 
 //-----------------------------------------------------------------------------
 
 int main(int argc, char *argv[])
 {
   Window win;
-  // ALLEGRO_BITMAP *image, *image1, *image2;
-
+  
   bool redraw = true, sair = false;
-  float bouncer_x, bouncer_y, bouncer_dx, bouncer_dy;
-  int mouse_button_state, ground;
-
+  
   win = graphinit(RES_WIDTH, RES_HEIGHT);
+  
+  ALLEGRO_EVENT ev;
+  float mouse_x, mouse_y;
+  double direction;
+  float bouncer_x, bouncer_y, bouncer_dx, bouncer_dy;
+  int speed = SPEED;
 
-  // image1 = imagemArq("Bug_01.png", BOUNCER_SIZE, BOUNCER_SIZE,win);
-  // image2 = imagemArq("Bug_02.png", BOUNCER_SIZE, BOUNCER_SIZE, win);
-  // image = image1;
-
-  // bouncer_x = win.disp_data.width / 2.0 - BOUNCER_SIZE / 2.0;
-  // bouncer_y = win.disp_data.height / 2.0 - BOUNCER_SIZE / 2.0;
 
   bouncer_x = win.disp_data.width / 2;
   bouncer_y = win.disp_data.height - BOUNCER_SIZE;
   bouncer_dx = SPEED;
   bouncer_dy = -SPEED;
+
+  bool mouse_button_state, ground = true;
+  ball_t balls_array[5];
   
-
-  /* Enquanto  a tecla ESC  n�o for  pressionada, ir� executar
-     o c�digo especificado
-  */
-  // int i = 0;
-  ALLEGRO_EVENT ev;
-  float mouse_x, mouse_y;
-  double direction;
-//   mouse_button_state = 2;
-  int speed = SPEED;
-
   while (!sair) 
   {
       
       al_wait_for_event(win.event_queue, &ev);
 
-      ground = false;
-      // button_up = false;
-      
       switch (ev.type) 
       {
+
         case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-            
+
             mouse_button_state = true;
-            mouse_x = ev.mouse.x;
-            mouse_y = ev.mouse.y;
+            if(ground)
+            {
+              mouse_x = ev.mouse.x;
+              mouse_y = ev.mouse.y;
 
-            if((mouse_x <= win.disp_data.width * 0.25) || (mouse_x >= win.disp_data.width * 0.75))
-                speed = SPEED * 1.05;
-            else 
-                speed = SPEED;
+              if((mouse_x <= win.disp_data.width * 0.25) || (mouse_x >= win.disp_data.width * 0.75))
+                  speed = SPEED2;
+              else 
+                  speed = SPEED;
 
-            direction = atan2(mouse_y - bouncer_y , mouse_x - bouncer_x);
-            bouncer_dx = speed * cos(direction);
-            bouncer_dy = speed * sin(direction);
+              direction = atan2(mouse_y - bouncer_y , mouse_x - bouncer_x);
+              bouncer_dx = speed * cos(direction);
+              bouncer_dy = speed * sin(direction);
+
+              ground = false;
+            }
 
             break;
     
@@ -86,16 +87,15 @@ int main(int argc, char *argv[])
             
             if(mouse_button_state)
             {
-                  if(bouncer_x < BOUNCER_SIZE || bouncer_x > win.disp_data.width - BOUNCER_SIZE)
+                  if(bouncer_x <= BOUNCER_SIZE || bouncer_x >= win.disp_data.width - BOUNCER_SIZE)
                     bouncer_dx = -bouncer_dx;
                   
-                  if(bouncer_y < BOUNCER_SIZE)
+                  if(bouncer_y <= BOUNCER_SIZE)
                     bouncer_dy = -bouncer_dy;
 
-                  // bouncer_y > 590
                   if (bouncer_y > win.disp_data.height - BOUNCER_SIZE)
                   {
-                      ground = 1;
+                      ground = true;
                       printf("ground: %d\n", ground);
                       mouse_button_state = false;
                       bouncer_y = win.disp_data.height - BOUNCER_SIZE;
