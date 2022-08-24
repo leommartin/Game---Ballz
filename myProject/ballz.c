@@ -152,13 +152,16 @@ int main(int argc, char *argv[])
             // for(int i = 0; i < 9; i++)
             // for(int j = 0; j < 7; j++)
             //     al_draw_filled_rectangle(square.x1 + MARGIN + SQUARE_WIDTH*j, square.y1+ MARGIN, square.x2 + SQUARE_WIDTH * (j+1), square.y2 + SQUARE_HEIGHT, al_map_rgb(255,255,0));
-
-            for(int j = 1; j < 7; j++)
-                al_draw_filled_rectangle(
-                    square.x1 + MARGIN, 
-                    square.y1 + MARGIN + SQUARE_HEIGHT*j ,
-                    square.x2 + SQUARE_WIDTH,
-                    square.y2 + SQUARE_HEIGHT*(j+1), al_map_rgb(255,255,0));
+            for(int i = 1; i < 7; i++)
+                for(int j = 0; j < 7; j++)
+                    al_draw_filled_rectangle
+                    (
+                        square.x1 + MARGIN + SQUARE_WIDTH  * j, 
+                        square.y1 + MARGIN + SQUARE_HEIGHT * i,
+                        square.x2 + SQUARE_WIDTH  * (j+1),
+                        square.y2 + SQUARE_HEIGHT * (i+1), 
+                        al_map_rgb(255,255,0)
+                    );
 
             // for(int j = 0; j < 7; j++)
             //     al_draw_filled_rectangle(square.x1 + MARGIN + SQUARE_WIDTH*j, square.y1+10, square.x2 + SQUARE_WIDTH * (j+1), square.y2+, al_map_rgb(255,255,0));
