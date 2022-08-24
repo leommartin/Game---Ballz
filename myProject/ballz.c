@@ -150,8 +150,8 @@ int main(int argc, char *argv[])
             al_clear_to_color(PRETO);
             
             // for(int i = 0; i < 9; i++)
-            for(int j = 0; j < 7; j++)
-                al_draw_filled_rectangle(square.x1 + MARGIN + SQUARE_WIDTH*j, square.y1+ MARGIN, square.x2 + SQUARE_WIDTH * (j+1), square.y2 + SQUARE_HEIGHT, al_map_rgb(255,255,0));
+            // for(int j = 0; j < 7; j++)
+            //     al_draw_filled_rectangle(square.x1 + MARGIN + SQUARE_WIDTH*j, square.y1+ MARGIN, square.x2 + SQUARE_WIDTH * (j+1), square.y2 + SQUARE_HEIGHT, al_map_rgb(255,255,0));
 
             for(int j = 1; j < 7; j++)
                 al_draw_filled_rectangle(
