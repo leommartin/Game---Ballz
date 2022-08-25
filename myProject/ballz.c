@@ -19,6 +19,10 @@
 #define SIZE_BLOCK_COLUMNS 7
 #define SIZE_BLOCK_LINES   8
 
+/* Posições */
+#define POS_START_SQUARE_Y (MARGIN + SQUARE_HEIGHT)
+
+
 // #define SQUARE_WIDTH 113.75
 // #define MARGIN 3.75
 
@@ -149,9 +153,6 @@ int main(int argc, char *argv[])
             redraw = false;
             al_clear_to_color(PRETO);
             
-            // for(int i = 0; i < 9; i++)
-            // for(int j = 0; j < 7; j++)
-            //     al_draw_filled_rectangle(square.x1 + MARGIN + SQUARE_WIDTH*j, square.y1+ MARGIN, square.x2 + SQUARE_WIDTH * (j+1), square.y2 + SQUARE_HEIGHT, al_map_rgb(255,255,0));
             for(int i = 1; i < 7; i++)
                 for(int j = 0; j < 7; j++)
                     al_draw_filled_rectangle
@@ -162,9 +163,6 @@ int main(int argc, char *argv[])
                         square.y2 + SQUARE_HEIGHT * (i+1), 
                         al_map_rgb(255,255,0)
                     );
-
-            // for(int j = 0; j < 7; j++)
-            //     al_draw_filled_rectangle(square.x1 + MARGIN + SQUARE_WIDTH*j, square.y1+10, square.x2 + SQUARE_WIDTH * (j+1), square.y2+, al_map_rgb(255,255,0));
             
             al_draw_filled_circle(ball.x, ball.y, BALL_SIZE, al_map_rgb(255,255,255));
 
