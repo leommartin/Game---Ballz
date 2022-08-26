@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include <allegro5/allegro_image.h>
@@ -10,18 +11,8 @@
 #include "graphicStructure.h"
 #include "ballzGameplay.h"
 
-/* Largura, altura e margem dos blocos */
-#define SQUARE_WIDTH    112.5
-#define SQUARE_HEIGHT   70
-#define MARGIN   12.5
-
-/* Tamanho da matriz de Blocos*/
-#define SIZE_BLOCK_COLUMNS 7
-#define SIZE_BLOCK_LINES   8
-
 /* Posições */
 #define POS_START_SQUARE_Y (MARGIN + SQUARE_HEIGHT)
-
 
 // #define SQUARE_WIDTH 113.75
 // #define MARGIN 3.75
@@ -35,24 +26,31 @@ int main(int argc, char *argv[])
     window = gameGraphicInit(DISPLAY_WIDTH, DISPLAY_HEIGHT);
     
     ALLEGRO_EVENT ev;
+    ALLEGRO_FONT* fontGame = al_load_font("resources/game_over.ttf", FONT_NUM_SIZE, 0);
 
     ball_t ball;
-    square_t square;
-    // square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS];
+    // square_t square;
+    square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS];
     mouse_t mouse;
     distance_t distance;
     int speed;
     mouse.button_state = false;
+    char strNum[10];
+    int i, j, l;
 
     ball.x = DISPLAY_WIDTH / 2;
     ball.y = DISPLAY_HEIGHT - BALL_SIZE;
     ball.ground = true;
     ball.shooted = false;
 
-    square.x1 = 0;
-    square.x2 = 0;
-    square.y1 = 0;
-    square.y2 = 0;
+    squaresInit(square);
+
+    l = 0;
+
+    // square.x1 = 0;
+    // square.x2 = 0;
+    // square.y1 = 0;
+    // square.y2 = 0;
 
     while (!sair) 
     {
@@ -117,16 +115,80 @@ int main(int argc, char *argv[])
                         
                         if(ball.x >= DISPLAY_WIDTH - BALL_SIZE)
                             ball.x = DISPLAY_WIDTH - BALL_SIZE*2;
+
+                        /* Copiar os quadrados ainda vivos para linha debaixo */
+                        for(l = SIZE_BLOCK_LINES; l >= 2; l--)
+                        {
+                            for(j = 0; j < SIZE_BLOCK_COLUMNS; j++)
+                            {
+                                if(square[l-1][j].alive)
+                                {
+                                    square[l][j].alive = 1;
+                                    square[l][j].life = square[l-1][j].life;
+                                }
+                                else 
+                                {
+                                    square[l][j].alive = 0;
+                                    square[l][j].life = 0;
+                                }
+
+                            }
+                        }
+                        
+                        /* Gerar uma nova linha inicial */
+                        i = 1;
+                        for(j = 0; j < SIZE_BLOCK_COLUMNS; j++)
+                        {
+                            square[i][j].alive = rand() % 2;
+
+                            if(square[i][j].alive)
+                            {
+                                if( ! (square[i][j].life = rand() % 4))
+                                    square[i][j].life = 1;
+                            }
+                            else 
+                                square[i][j].life = 0;
+                        }
+
+
                     }
                     else
                     {                    
-                        printf("squareX1: %.2f, squareY1: %.2f, squareX2: %.2f, squareY2: %.2f, ballX: %.2f, ballY: %.2f\n", 
-                        square.x1, square.y1, square.x2, square.y2, ball.x, ball.y);
+                        bool cv = false;
+                        for(i = 1; i < SIZE_BLOCK_LINES; i++)
+                        {
+                            for(j = 0; j < SIZE_BLOCK_COLUMNS; j++)
+                            {
+                                if(square[i][j].alive)
+                                {
+                                    if(collide_vertical(square[i][j].x1, square[i][j].y1, square[i][j].x2, square[i][j].y2, ball.x, ball.y))
+                                    {
+                                        ball.dy = -ball.dy; 
 
-                        // if(collide_vertical(square.x1, square.y1, square.x2, square.y2, ball.x, ball.y))
-                        //     ball.dy = -ball.dy; 
-                        // if(collide_lateral(square.x1, square.y1, square.x2, square.y2, ball.x, ball.y))
-                        //     ball.dx = -ball.dx;
+                                        square[i][j].life--;
+                                        if(square[i][j].life <= 0)
+                                            square[i][j].alive = 0;
+
+                                        printf("colisão vertical\n");
+
+                                        cv = true;
+                                    }
+                                    if(collide_lateral(square[i][j].x1, square[i][j].y1, square[i][j].x2, square[i][j].y2, ball.x, ball.y))
+                                    {
+                                        ball.dx = -ball.dx;
+
+                                        if( ! cv )
+                                        square[i][j].life--;
+
+                                        if(square[i][j].life <= 0)
+                                            square[i][j].alive = 0;
+                                        
+                                        printf("colisão lateral\n");
+                                    }   
+                                    cv = false;
+                                }
+                            }
+                        }
                         
                         ball.x += ball.dx;
                         ball.y += ball.dy;
@@ -152,18 +214,28 @@ int main(int argc, char *argv[])
         {
             redraw = false;
             al_clear_to_color(PRETO);
-            
-            for(int i = 1; i < 7; i++)
-                for(int j = 0; j < 7; j++)
-                    al_draw_filled_rectangle
-                    (
-                        square.x1 + MARGIN + SQUARE_WIDTH  * j, 
-                        square.y1 + MARGIN + SQUARE_HEIGHT * i,
-                        square.x2 + SQUARE_WIDTH  * (j+1),
-                        square.y2 + SQUARE_HEIGHT * (i+1), 
-                        al_map_rgb(255,255,0)
-                    );
-            
+
+            for(int i = 1; i < SIZE_BLOCK_LINES; i++)
+            {
+                for(int j = 0; j < SIZE_BLOCK_COLUMNS; j++)
+                {   
+                    if(square[i][j].alive)
+                    {
+                        al_draw_filled_rectangle(square[i][j].x1, square[i][j].y1, square[i][j].x2 , square[i][j].y2, al_map_rgb(255,255,0));
+                        
+                        sprintf(strNum, "%d", square[i][j].life);
+
+                        al_draw_text(
+                            fontGame,
+                            al_map_rgb(0,0,0),
+                            square[i][j].text.x, 
+                            square[i][j].text.y,
+                            ALLEGRO_ALIGN_CENTER,
+                            strNum
+                        );
+                    }
+                }
+            }
             al_draw_filled_circle(ball.x, ball.y, BALL_SIZE, al_map_rgb(255,255,255));
 
             al_flip_display();
