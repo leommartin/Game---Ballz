@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
     
     ALLEGRO_EVENT ev;
     ALLEGRO_FONT* fontGame = al_load_font("resources/game_over.ttf", FONT_NUM_SIZE, 0);
+    ALLEGRO_FONT* fontGameOver = al_load_font("resources/game_over.ttf", FONT_GAMEOVER_SIZE, 0);
+    ALLEGRO_FONT* fontBall = al_load_font("resources/font_ball.otf", FONT_BALL_SIZE, 0);
 
     ball_t ball;
     // square_t square;
@@ -37,11 +39,13 @@ int main(int argc, char *argv[])
     mouse.button_state = false;
     char strNum[10];
     int i, j, l;
+    bool gameover;
 
     ball.x = DISPLAY_WIDTH / 2;
     ball.y = DISPLAY_HEIGHT - BALL_SIZE;
     ball.ground = true;
     ball.shooted = false;
+    gameover = false;
 
     squaresInit(square);
 
@@ -62,7 +66,7 @@ int main(int argc, char *argv[])
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
 
                 if((ev.mouse.y <= DISPLAY_HEIGHT - 4 * BALL_SIZE))
-                mouse.button_state = true;
+                    mouse.button_state = true;
 
                 if(ball.ground && mouse.button_state)
                 {
@@ -89,7 +93,7 @@ int main(int argc, char *argv[])
         
             case ALLEGRO_EVENT_TIMER:
                 
-                if(mouse.button_state)
+                if(mouse.button_state && !gameover)
                 {
                     /* Verifica os limites laterais do Display */
                     if(ball.x <= BALL_SIZE || ball.x >= DISPLAY_WIDTH - BALL_SIZE)
@@ -109,6 +113,20 @@ int main(int argc, char *argv[])
                         ball.y = BALL_FLOOR;
                         ball.shooted = false;
 
+                        /* Se restaram quadrados na penúltima linha da matriz, então é o fim do jogo */
+                        /* To Do: Tentar implementar o efeito de desenhar última linha(sem que haja uma jogada) e encerrar */
+                        /* Talvez isso esteja no lugar errado!! */
+                        l = SIZE_BLOCK_LINES-2;
+                        for(int c = 0; c < SIZE_BLOCK_COLUMNS; c++)
+                        {
+                            if(square[l][c].alive)
+                            {
+                                gameover = true;
+                                printf("%d, %d\n", l, c);
+                            }
+                            printf("[%d][%d] : %d\n", l, c, square[i][j].alive);
+                        }
+
                         /* Verificações para que a bola ao início do jogo não esteja em posições indevidas */
                         if(ball.x <= BALL_SIZE)
                             ball.x = BALL_SIZE * 2;
@@ -123,12 +141,12 @@ int main(int argc, char *argv[])
                             {
                                 if(square[l-1][j].alive)
                                 {
-                                    square[l][j].alive = 1;
+                                    square[l][j].alive = true;
                                     square[l][j].life = square[l-1][j].life;
                                 }
                                 else 
                                 {
-                                    square[l][j].alive = 0;
+                                    square[l][j].alive = false;
                                     square[l][j].life = 0;
                                 }
 
@@ -173,7 +191,7 @@ int main(int argc, char *argv[])
 
                                         cv = true;
                                     }
-                                    if(collide_lateral(square[i][j].x1, square[i][j].y1, square[i][j].x2, square[i][j].y2, ball.x, ball.y))
+                                    else if(collide_lateral(square[i][j].x1, square[i][j].y1, square[i][j].x2, square[i][j].y2, ball.x, ball.y))
                                     {
                                         ball.dx = -ball.dx;
 
@@ -215,7 +233,7 @@ int main(int argc, char *argv[])
             redraw = false;
             al_clear_to_color(PRETO);
 
-            for(int i = 1; i < SIZE_BLOCK_LINES; i++)
+            for(int i = 1; i <= SIZE_BLOCK_LINES; i++)
             {
                 for(int j = 0; j < SIZE_BLOCK_COLUMNS; j++)
                 {   
@@ -236,7 +254,17 @@ int main(int argc, char *argv[])
                     }
                 }
             }
+
             al_draw_filled_circle(ball.x, ball.y, BALL_SIZE, al_map_rgb(255,255,255));
+
+            if(ball.ground)
+                al_draw_text(fontBall, BRANCO, ball.x - BALL_SIZE, ball.y - BALL_SIZE*3, ALLEGRO_ALIGN_CENTER, "x1");
+
+            if(gameover)
+            {
+                al_clear_to_color(PRETO);
+                al_draw_text(fontGameOver, BRANCO, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/3, ALLEGRO_ALIGN_CENTER, "Game Over");
+            }
 
             al_flip_display();
         }

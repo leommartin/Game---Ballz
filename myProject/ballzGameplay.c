@@ -18,7 +18,7 @@ void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
 {
     srand(time(NULL));
 
-    for(int i = 1; i < SIZE_BLOCK_LINES; i++)
+    for(int i = 1; i <= SIZE_BLOCK_LINES; i++)
     {
         for(int j= 0; j < SIZE_BLOCK_COLUMNS; j++)
         {
@@ -27,7 +27,7 @@ void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
             square[i][j].x2 = SQUARE_WIDTH * (j+1);
             square[i][j].y2 = SQUARE_HEIGHT * (i+1);
             
-            square[i][j].alive = 0;
+            square[i][j].alive = false;
             square[i][j].life  = 0;
 
             square[i][j].text.x = (square[i][j].x1 + square[i][j].x2) / 2;

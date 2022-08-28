@@ -27,8 +27,8 @@
 #define MARGIN   12.5
 
 #define FONT_NUM_SIZE 50
-
-
+#define FONT_BALL_SIZE 18
+#define FONT_GAMEOVER_SIZE 200
 
 /* Structs */
 typedef struct ball
@@ -49,7 +49,7 @@ typedef struct square
 {
     float x1,y1,x2,y2;
     int life;
-    int alive;
+    bool alive;
     text_t text;
 } 
 square_t;
