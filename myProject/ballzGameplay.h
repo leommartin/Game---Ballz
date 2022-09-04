@@ -29,6 +29,16 @@
 #define FONT_NUM_SIZE 50
 #define FONT_BALL_SIZE 18
 #define FONT_GAMEOVER_SIZE 200
+#define FONT_LOGO_SIZE 100
+
+#define PLAY_BUTTON_POS_X1 (DISPLAY_WIDTH/2-100)
+#define PLAY_BUTTON_POS_Y1 (DISPLAY_HEIGHT/2)
+#define PLAY_BUTTON_POS_X2 (DISPLAY_WIDTH/2+100)
+#define PLAY_BUTTON_POS_Y2 (DISPLAY_HEIGHT/2+40)
+#define ROUNDED_SIZE       20
+
+#define BOTAO_ROSA         234, 35, 94
+#define MAX_ALIVE 5
 
 /* Structs */
 typedef struct ball
@@ -57,7 +67,7 @@ square_t;
 typedef struct mouse 
 {
     float x,y;
-    bool button_state;
+    int button_state;
 } 
 mouse_t;
 
@@ -77,3 +87,5 @@ bool collide(int p1_x1, int p1_y1, int p1_x2, int p1_y2, int p2_x1, int p2_y1, i
 bool collide_vertical(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y);
 
 bool collide_lateral(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y);
+
+int click_play_button(ALLEGRO_MOUSE_STATE *mouse_state);
