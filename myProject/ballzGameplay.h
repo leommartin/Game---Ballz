@@ -1,11 +1,7 @@
 /* Macros para Display, Buffer e posições */
 
-#define BUFFER_HEIGHT   150
-#define BUFFER_WIDTH    200
-
-#define DISPLAY_SCALE   4
-#define DISPLAY_HEIGHT  (BUFFER_HEIGHT * DISPLAY_SCALE)
-#define DISPLAY_WIDTH   (BUFFER_WIDTH  * DISPLAY_SCALE)
+#define DISPLAY_HEIGHT  800
+#define DISPLAY_WIDTH   495
 
 /* Macros para bola, velocidade, posições */
 #define BALL_SIZE    10
@@ -17,14 +13,12 @@
 
 /* Tamanho da matriz de Blocos*/
 #define SIZE_BLOCK_COLUMNS 7
-#define SIZE_BLOCK_LINES   8
+#define SIZE_BLOCK_LINES   9
 
 /* Largura, altura e margem dos blocos */
-#define SQUARE_WIDTH    112.5
-// #define SQUARE_WIDTH 113.75
+#define SQUARE_WIDTH    70
 #define SQUARE_HEIGHT   70
-// #define MARGIN 3.75
-#define MARGIN   12.5
+#define MARGIN   5
 
 #define FONT_NUM_SIZE 50
 #define FONT_BALL_SIZE 18
@@ -39,6 +33,9 @@
 
 #define BOTAO_ROSA         234, 35, 94
 #define MAX_ALIVE 5
+#define LIMIT_Y_GAME      (DISPLAY_HEIGHT/8)
+
+#define FONT_SCORE_GAMEOVER_SIZE 100
 
 /* Structs */
 typedef struct ball
@@ -48,6 +45,13 @@ typedef struct ball
     bool shooted, ground;
 } 
 ball_t;
+
+typedef struct ballSight
+{
+    // ball_t balls;
+    float x,y;
+}
+ballSight_t;
 
 typedef struct text
 {
@@ -88,4 +92,6 @@ bool collide_vertical(float square_x1, float square_y1, float square_x2, float s
 
 bool collide_lateral(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y);
 
-int click_play_button(ALLEGRO_MOUSE_STATE *mouse_state);
+int click_centre_button(ALLEGRO_MOUSE_STATE *mouse_state);
+
+int click_side_button(ALLEGRO_MOUSE_STATE *mouse_state);

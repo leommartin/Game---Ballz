@@ -18,14 +18,16 @@ void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
 {
     srand(time(NULL));
 
-    for(int i = 1; i <= SIZE_BLOCK_LINES; i++)
+    /* To do: Implementar linha nula e de gameover corretamente*/
+
+    for(int i = 0; i < SIZE_BLOCK_LINES; i++)
     {
         for(int j= 0; j < SIZE_BLOCK_COLUMNS; j++)
         {
-            square[i][j].x1 = MARGIN + SQUARE_WIDTH  * j;
-            square[i][j].y1 = MARGIN + SQUARE_HEIGHT * i;
-            square[i][j].x2 = SQUARE_WIDTH  * (j+1);
-            square[i][j].y2 = SQUARE_HEIGHT * (i+1);
+            square[i][j].x1 = MARGIN + SQUARE_WIDTH * j;
+            square[i][j].y1 = LIMIT_Y_GAME + SQUARE_HEIGHT * (i+1) + MARGIN;
+            square[i][j].x2 = SQUARE_WIDTH * (j+1);
+            square[i][j].y2 = LIMIT_Y_GAME + SQUARE_HEIGHT * (i+2);
             
             square[i][j].alive = false;
             square[i][j].life  = 0;
@@ -38,7 +40,7 @@ void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
     }
 
     /* Primeira geração da linha aleatória inicial */
-    int i = 1;
+    int i = 0;
     for(int j= 0; j < SIZE_BLOCK_COLUMNS; j++)
     {
         square[i][j].alive = rand() % 2;
@@ -108,7 +110,7 @@ bool collide_lateral(float square_x1, float square_y1, float square_x2, float sq
     return false;
 }
 
-int click_play_button(ALLEGRO_MOUSE_STATE *mouse_state)
+int click_centre_button(ALLEGRO_MOUSE_STATE *mouse_state)
 {
     return collide
     (
@@ -120,5 +122,20 @@ int click_play_button(ALLEGRO_MOUSE_STATE *mouse_state)
         PLAY_BUTTON_POS_Y1,
         PLAY_BUTTON_POS_X2,
         PLAY_BUTTON_POS_Y2
+    );
+}
+
+int click_side_button(ALLEGRO_MOUSE_STATE *mouse_state)
+{
+    return collide
+    (
+        mouse_state->x,
+        mouse_state->y,
+        mouse_state->x,
+        mouse_state->y,
+        MARGIN*2,
+        LIMIT_Y_GAME/7,
+        DISPLAY_WIDTH/5, 
+        LIMIT_Y_GAME/2
     );
 }

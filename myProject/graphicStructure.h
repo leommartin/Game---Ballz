@@ -1,12 +1,8 @@
 #include <allegro5/allegro.h>
 /* Macros de Display e Buffer */
 
-#define BUFFER_HEIGHT   150
-#define BUFFER_WIDTH    200
-
-#define DISPLAY_SCALE   4
-#define DISPLAY_HEIGHT  (BUFFER_HEIGHT * DISPLAY_SCALE)
-#define DISPLAY_WIDTH   (BUFFER_WIDTH  * DISPLAY_SCALE)
+#define DISPLAY_HEIGHT   800
+#define DISPLAY_WIDTH    495
 
 #define _60FPS_         (1.0 / 60.0)
 

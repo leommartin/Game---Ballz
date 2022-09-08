@@ -44,8 +44,8 @@ gameWindow gameGraphicInit(int res_width, int res_height)
     window.display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
     must_init(window.display, "display");
 
-    window.buffer = al_create_bitmap(BUFFER_WIDTH, BUFFER_HEIGHT);
-    must_init(window.buffer, "buffer");
+    // window.buffer = al_create_bitmap(BUFFER_WIDTH, BUFFER_HEIGHT);
+    // must_init(window.buffer, "buffer");
 
     /* Instala o handler de timer do Allegro */
     window.timer = al_create_timer( _60FPS_ );
