@@ -99,10 +99,38 @@ int main(int argc, char *argv[])
 
                 al_get_mouse_state(&mouse_state);
 
+                // To do: add estado para quando estiver jogando e quiser ir para o menu pelo botao lateral.
+
                 if(click_centre_button(&mouse_state) && menu) 
                 {
-                    printf("Botão play foi acionado.\n");
+                    printf("Botão PLAY foi acionado.\n");
                     menu = 0;
+                }
+                else if(click_side_button(&mouse_state) && menu) 
+                {
+                    printf("Botão INFO acionado.\n");
+                    // gameover = 0;
+                    menu = 0;
+                    info = 1;
+                    // mouse.button_state = 0;
+                }
+                else if(click_side_button(&mouse_state) && info) 
+                {
+                    printf("Botão INFO acionado.\n");
+                    // gameover = 0;
+                    menu = 1;
+                    info = 0;
+                    // mouse.button_state = 0;
+                }
+                else if(click_centre_button(&mouse_state) && gameover) 
+                {
+                    printf("Botão MENU foi acionado.\n");
+                    gameover = 0;
+                    menu = 1;
+                    // mouse.button_state = 0;
+                    score = 1;
+                    squaresInit(square);
+                    ball = ballInit(ball);
                 }
                 else if( (ev.mouse.y <= DISPLAY_HEIGHT - 6 * BALL_SIZE) && !menu )
                     mouse.button_state = 1;
@@ -321,30 +349,10 @@ int main(int argc, char *argv[])
                     ALLEGRO_ALIGN_CENTER, 
                     "MENU"
                 );
-
-                if(click_centre_button(&mouse_state)) 
-                {
-                    printf("Botão MENU foi acionado.\n");
-                    gameover = 0;
-                    menu = 1;
-                    mouse.button_state = 0;
-                    score = 1;
-                    squaresInit(square);
-                    ball = ballInit(ball);
-                }
             }
             else if (menu)
             {   
                 al_draw_filled_rounded_rectangle(MARGIN*2, LIMIT_Y_GAME/7, DISPLAY_WIDTH/5, LIMIT_Y_GAME/2, 15,15, al_map_rgb(50,50,50));
-                
-                if(click_side_button(&mouse_state)) 
-                {
-                    printf("Botão INFO acionado.\n");
-                    gameover = 0;
-                    menu = 0;
-                    info = 1;
-                    mouse.button_state = 0;
-                }
 
                 al_draw_text
                 (
