@@ -95,3 +95,5 @@ bool collide_lateral(float square_x1, float square_y1, float square_x2, float sq
 int click_centre_button(ALLEGRO_MOUSE_STATE *mouse_state);
 
 int click_side_button(ALLEGRO_MOUSE_STATE *mouse_state);
+
+int scoreCompare(int lastScore);

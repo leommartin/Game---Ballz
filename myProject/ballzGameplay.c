@@ -139,3 +139,47 @@ int click_side_button(ALLEGRO_MOUSE_STATE *mouse_state)
         LIMIT_Y_GAME/2
     );
 }
+
+int scoreCompare(int lastScore)
+{
+    FILE *arq;
+    int scoreArq;
+
+    arq = fopen(".highest_score.txt", "r");
+    
+    /* Se não existe arquivo de score, cria-se um com o score da última partida*/ 
+    if( !arq )
+    {
+        printf("Criando arquivo de High Score...\n");
+
+        arq = fopen(".highest_score.txt", "w");
+        fprintf(arq, "%d", lastScore);
+        fclose(arq);
+
+        return lastScore;
+    }
+    /* Existe arquivo de score, então compara-se o score da última partida com o score do arquivo */
+    else
+    {
+        fscanf(arq, "%d", &scoreArq);
+
+        if(scoreArq < lastScore)
+        {
+            fclose(arq);
+
+            arq = fopen(".highest_score.txt", "w");
+            fprintf(arq, "%d", lastScore);
+
+            fclose(arq);
+
+            printf("%d é maior que %d. Substituindo High Score...\n", lastScore, scoreArq);
+            return lastScore;
+        }
+        else
+        {
+            fclose(arq);
+            printf("Mantém-se o score do arquivo.\n");
+            return scoreArq;
+        }
+    }
+}

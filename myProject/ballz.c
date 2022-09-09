@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     ALLEGRO_FONT* fontBall = al_load_font("resources/font_ball.otf", FONT_BALL_SIZE, 0);
     ALLEGRO_FONT* logoFont = al_load_font("resources/desenho.ttf", FONT_LOGO_SIZE, 0);
     ALLEGRO_FONT* fontButton = al_load_font("resources/font_button.otf", 20, 0);
-    ALLEGRO_FONT* fontScore = al_load_font("resources/font_score.ttf", 40, 0);
+    ALLEGRO_FONT* fontScore = al_load_font("resources/font_score.ttf", 50, 0);
     ALLEGRO_FONT* fontScoreEnd = al_load_font("resources/font_score.ttf", FONT_SCORE_GAMEOVER_SIZE, 0);
     ALLEGRO_FONT* fontSquare = al_load_font("resources/font_score.ttf", 25, 0);
 
@@ -67,18 +67,24 @@ int main(int argc, char *argv[])
     float distX[CONST], distY[CONST];
     char strNum[10];
     int i, j, l;
-    int gameover, menu, info, score;
+    int gameover, menu, info, playing;
+    int score, bestScore;
 
     squaresInit(square);
 
+    // aqui cabe uma função para inicializar as variáveis
     menu = 1;
     info = 0;
     score = 1;
+    bestScore = 0;
     gameover = 0;
+    playing = 0;
   
     mouse.button_state = 0;
 
     ball = ballInit(ball);
+
+    bestScore = scoreCompare(score);
     
     ALLEGRO_MOUSE_STATE mouse_state;
     
@@ -101,39 +107,47 @@ int main(int argc, char *argv[])
 
                 // To do: add estado para quando estiver jogando e quiser ir para o menu pelo botao lateral.
 
+                /* Menu -> PLAY button */
                 if(click_centre_button(&mouse_state) && menu) 
                 {
                     printf("Botão PLAY foi acionado.\n");
                     menu = 0;
+                    playing = 1;
                 }
+                /* Menu -> INFO button */
                 else if(click_side_button(&mouse_state) && menu) 
                 {
                     printf("Botão INFO acionado.\n");
-                    // gameover = 0;
                     menu = 0;
                     info = 1;
-                    // mouse.button_state = 0;
                 }
+                /* Info -> MENU button */
                 else if(click_side_button(&mouse_state) && info) 
                 {
-                    printf("Botão INFO acionado.\n");
-                    // gameover = 0;
+                    printf("Botão MENU acionado.\n");
                     menu = 1;
                     info = 0;
-                    // mouse.button_state = 0;
                 }
+                /* Gameover -> MENU button */
                 else if(click_centre_button(&mouse_state) && gameover) 
                 {
                     printf("Botão MENU foi acionado.\n");
                     gameover = 0;
                     menu = 1;
-                    // mouse.button_state = 0;
                     score = 1;
                     squaresInit(square);
                     ball = ballInit(ball);
                 }
-                else if( (ev.mouse.y <= DISPLAY_HEIGHT - 6 * BALL_SIZE) && !menu )
+                /* Playing -> MENU button */
+                else if(click_side_button(&mouse_state) && playing) 
+                {
+                    printf("Botão MENU foi acionado.\n");
+                    menu = 1;
+                    playing = 0;
+                }
+                else if( (ev.mouse.y <= DISPLAY_HEIGHT - 6 * BALL_SIZE) && playing)
                     mouse.button_state = 1;
+                // To Do: ta rolando o jogo na tela de info, gameover, basta colocar o state playing na condição
 
                 if(ball.ground && mouse.button_state)
                 {
@@ -186,6 +200,13 @@ int main(int argc, char *argv[])
                         {
                             if(square[l][c].alive)
                                 gameover = true;
+                            
+                        }
+
+                        if(gameover)
+                        {
+                            bestScore = scoreCompare(score);
+                            printf("%d\n", bestScore);
                         }
 
                         /* Verificações para que a bola ao início do jogo não esteja em posições indevidas */
@@ -312,6 +333,7 @@ int main(int argc, char *argv[])
 
             if(gameover)
             {
+                playing = 0;
                 al_draw_text(fontGameOver, BRANCO, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/5, ALLEGRO_ALIGN_CENTER, "Game Over");
                 // printf("score: %d", score);
 
@@ -394,7 +416,7 @@ int main(int argc, char *argv[])
                     fontButton, 
                     al_map_rgb(255, 255, 255),
                     (MARGIN + DISPLAY_WIDTH/10), 
-                    (MARGIN + LIMIT_Y_GAME/7),
+                    (MARGIN + LIMIT_Y_GAME/8),
                     ALLEGRO_ALIGN_CENTER, 
                     "MENU"
                 );
@@ -411,19 +433,8 @@ int main(int argc, char *argv[])
                 al_draw_bitmap(info1, DISPLAY_WIDTH/10, DISPLAY_HEIGHT/8, 0);
                 al_draw_bitmap(info2, DISPLAY_WIDTH/10, DISPLAY_HEIGHT*0.56, 0);
             }
-            else // Desenha o jogo
+            else if(playing)// Desenha o jogo'
             {
-                if(click_side_button(&mouse_state)) 
-                {
-                    printf("Botão MENU foi acionado.\n");
-                    gameover = 0;
-                    menu = 1;
-                    mouse.button_state = 0;
-                    score = 1;
-                    squaresInit(square);
-                    ball = ballInit(ball);
-                }
-
                 al_draw_filled_rectangle(0, 0, DISPLAY_WIDTH, LIMIT_Y_GAME, al_map_rgb(38,38,38));
 
                 al_draw_filled_rounded_rectangle(MARGIN*2, LIMIT_Y_GAME/7, DISPLAY_WIDTH/5, LIMIT_Y_GAME/2, 15,15, al_map_rgb(BOTAO_ROSA));
@@ -433,13 +444,37 @@ int main(int argc, char *argv[])
                     fontButton, 
                     al_map_rgb(255, 255, 255),
                     (MARGIN + DISPLAY_WIDTH/10), 
-                    (MARGIN + LIMIT_Y_GAME/7),
+                    (MARGIN + LIMIT_Y_GAME/8),
                     ALLEGRO_ALIGN_CENTER, 
                     "MENU"
                 );
-
+                
                 sprintf(strNum, "%d", score);
-                al_draw_text(fontScore, BRANCO, DISPLAY_WIDTH/2, LIMIT_Y_GAME/10, ALLEGRO_ALIGN_CENTER, strNum);
+                al_draw_text(fontScore, BRANCO, DISPLAY_WIDTH/2, LIMIT_Y_GAME/12, ALLEGRO_ALIGN_CENTER, strNum);
+
+                al_draw_text
+                (
+                    fontButton, 
+                    al_map_rgb(255, 255, 255),
+                    (DISPLAY_WIDTH*0.9), 
+                    (LIMIT_Y_GAME/7),
+                    ALLEGRO_ALIGN_CENTER, 
+                    "BEST"
+                );
+                
+                if(bestScore <  score)
+                    bestScore = score;
+                
+                sprintf(strNum, "%d", bestScore);
+                al_draw_text
+                (
+                    fontButton, 
+                    al_map_rgb(255, 255, 255),
+                    (DISPLAY_WIDTH*0.9), 
+                    (LIMIT_Y_GAME/3 + MARGIN),
+                    ALLEGRO_ALIGN_CENTER, 
+                    strNum
+                );
 
                 for(int i = 0; i < SIZE_BLOCK_LINES; i++)
                 {
@@ -473,7 +508,7 @@ int main(int argc, char *argv[])
                 {
                     al_draw_text(fontBall, BRANCO, ball.x - BALL_SIZE, ball.y - BALL_SIZE*3, ALLEGRO_ALIGN_CENTER, "x1");
                     
-                    if( (DISPLAY_HEIGHT - (BALL_SIZE * 6)) >= sight.y)
+                    if( (DISPLAY_HEIGHT - (BALL_SIZE * 6)) >= sight.y && sight.y >= LIMIT_Y_GAME)
                     {
                         float cont = 0;
                         int mult = 3;
