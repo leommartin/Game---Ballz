@@ -14,7 +14,7 @@
 #include "ballzGameplay.h"
 
 /* Inicializa os quadrados com uma posição inicial */
-void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
+void blocksInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS], ballBlock_t ballBlock[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
 {
     srand(time(NULL));
 
@@ -28,9 +28,14 @@ void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
             square[i][j].y1 = LIMIT_Y_GAME + SQUARE_HEIGHT * (i+1) + MARGIN;
             square[i][j].x2 = SQUARE_WIDTH * (j+1);
             square[i][j].y2 = LIMIT_Y_GAME + SQUARE_HEIGHT * (i+2);
+
+            ballBlock[i][j].x = (square[i][j].x1 + square[i][j].x2)/2;
+            ballBlock[i][j].y = (square[i][j].y1 + square[i][j].y2)/2;
             
             square[i][j].alive = false;
             square[i][j].life  = 0;
+
+            ballBlock[i][j].alive = false;
 
             square[i][j].text.x = (square[i][j].x1 + square[i][j].x2)  / 2;
             square[i][j].text.y = ((square[i][j].y1 + square[i][j].y2) / 2) - FONT_NUM_SIZE/3;
@@ -41,17 +46,27 @@ void squaresInit(square_t square[SIZE_BLOCK_LINES][SIZE_BLOCK_COLUMNS])
 
     /* Primeira geração da linha aleatória inicial */
     int i = 0;
+    int alives = 0;
     for(int j= 0; j < SIZE_BLOCK_COLUMNS; j++)
     {
-        square[i][j].alive = rand() % 2;
-                
-        if(square[i][j].alive)
+        if(alives < MAX_ALIVE)
         {
-            if( !(square[i][j].life = rand() % 2) )
-                square[i][j].life = 1;
+            square[i][j].alive = rand() % 2;
+                    
+            if(square[i][j].alive)
+            {
+                if( !(square[i][j].life = rand() % 2) )
+                    square[i][j].life = 1;
+                alives++;
+            }
+            else 
+                square[i][j].life = 0;
         }
-        else 
+        else
+        {
+            square[i][j].alive = false;
             square[i][j].life = 0;
+        }
     }
 }
 
@@ -72,39 +87,51 @@ bool collide(int p1_x1, int p1_y1, int p1_x2, int p1_y2, int p2_x1, int p2_y1, i
 }
 
 
-bool collide_vertical(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y)
+bool collide_vertical(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y, float dx, float dy)
 {
     /* Testa colisao por baixo */
-    if((ball_x >= square_x1 - BALL_SIZE) && (ball_x <= square_x2 + BALL_SIZE))
+    if((ball_x >= square_x1 - SPEED) && (ball_x <= square_x2 + SPEED))
     {
-        if(abs(ball_y - square_y2) <= BALL_SIZE)
-            return true;
+        if(abs(ball_y - square_y2) <= SPEED)
+        {
+            if(dy < 0)
+                return true;
+        }
     }
 
     /* Testa colisao por cima */
-    if((ball_x >= square_x1 - BALL_SIZE) && (ball_x <= square_x2 + BALL_SIZE))
+    if((ball_x >= square_x1 - SPEED) && (ball_x <= square_x2 + SPEED))
     {
-        if(abs(ball_y - square_y1) <= BALL_SIZE)
-            return true;
+        if(abs(ball_y - square_y1) <= SPEED)
+        {
+            if(dy > 0)
+                return true;
+        }
     }        
 
     return false;
 }
 
-bool collide_lateral(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y)
+bool collide_lateral(float square_x1, float square_y1, float square_x2, float square_y2, float ball_x, float ball_y, float dx, float dy)
 {
     /* Testa colisao pela esquerda */
-    if((ball_y >= square_y1 - BALL_SIZE) && (ball_y <= square_y2 + BALL_SIZE))
+    if((ball_y >= square_y1 - SPEED) && (ball_y <= square_y2 + SPEED))
     {
-        if(abs(ball_x - square_x1) <= BALL_SIZE)
-            return true;
+        if(abs(ball_x - square_x1) <= SPEED)
+        {
+            if(dx > 0)
+                return true;
+        }
     }
     
     /* Testa colisao pela direita */
-    if((ball_y >= square_y1 - BALL_SIZE) && (ball_y <= square_y2 + BALL_SIZE))
+    if((ball_y >= square_y1 - SPEED) && (ball_y <= square_y2 + SPEED))
     {
-        if( (ball_x >= square_x2) && (abs(ball_x - square_x2) <= BALL_SIZE) )
-            return true;
+        if( (ball_x >= square_x2) && (abs(ball_x - square_x2) <= SPEED) ) 
+        {
+            if(dx < 0)
+                return true;
+        }
     }
 
     return false;
@@ -181,5 +208,51 @@ int scoreCompare(int lastScore)
             printf("Mantém-se o score do arquivo.\n");
             return scoreArq;
         }
+    }
+}
+
+ball_t* createBall(float x, float y)
+{
+    ball_t *ball = malloc(sizeof(ball_t*));
+
+    ball->x = x;
+    ball->y = y;
+    ball->dx = 0.0;
+    ball->dy = 0.0;
+    ball->ground = true;
+    ball->moving = false;
+    ball->launched = false;
+
+    return ball;
+}
+
+ball_t** initBallsArray(ball_t* ball)
+{
+    ball_t** aux = malloc(sizeof(ball_t*));
+    aux[0] = ball;
+    return aux;
+}
+
+ball_t** addBalls(ball_t** balls, ball_t * aux, int tam)
+{
+    balls = realloc(balls, (tam+1)*sizeof(ball_t*));
+    balls[tam] = aux;
+    return balls;
+}
+
+int ballsGround(ball_t** balls, int tam)
+{
+    for(int i = 0; i < tam; i++)
+        if(balls[i]->moving)
+            return 0;
+    return 1;
+}
+
+void resetBalls(ball_t** balls, float initialX, int tam)
+{
+    for(int i = 0; i < tam; i++)
+    { 
+        balls[i]->x = initialX;
+        balls[i]->y = BALL_FLOOR;
     }
 }
